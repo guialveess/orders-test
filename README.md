@@ -1,6 +1,6 @@
 # Order Management API
 
-API RESTful para gerenciamento de pedidos de laboratório com autenticação JWT, documentação Swagger e suíte completa de testes.
+API RESTful para gerenciamento de pedidos com autenticação JWT, documentação Swagger e suíte completa de testes.
 
 ## Índice
 
@@ -17,7 +17,7 @@ API RESTful para gerenciamento de pedidos de laboratório com autenticação JWT
 
 ## Visão Geral
 
-Esta API foi desenvolvida para gerenciar pedidos de laboratório, permitindo:
+Esta API foi desenvolvida para gerenciar pedidos, permitindo:
 
 - Registro e autenticação de usuários
 - Criação e gerenciamento de pedidos

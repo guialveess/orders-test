@@ -2,6 +2,8 @@
 
 API RESTful para gerenciamento de pedidos com autenticação JWT, documentação Swagger e suíte completa de testes.
 
+<img width="1470" height="956" alt="Captura de Tela 2025-12-25 às 19 02 43" src="https://github.com/user-attachments/assets/4a8de86b-33a2-4811-9545-a4e001215fe8" />
+
 ## Índice
 
 - [Visão Geral](#visão-geral)

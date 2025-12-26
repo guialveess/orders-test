@@ -1,0 +1,23 @@
+services:
+  api:
+    container_name: order_api
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    command: bun server.ts
+
+  mongo:
+    container_name: order_mongo
+    image: mongo:7
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
+volumes:
+  mongodata:

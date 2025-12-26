@@ -104,8 +104,6 @@ order-test/
 ├── tsconfig.json         # Configuração do TypeScript
 ├── vitest.config.ts      # Configuração do Vitest
 ├── README.md             # Este arquivo
-├── TESTING.md            # Guia detalhado de testes
-└── TROUBLESHOOTING.md   # Guia de troubleshooting
 ```
 
 ### Padrões de Arquitetura
@@ -375,8 +373,6 @@ describe('My Feature', () => {
 });
 ```
 
-Para mais informações sobre testes, consulte o [`TESTING.md`](TESTING.md:1).
-
 ## Boas Práticas
 
 ### 1. Organização de Código
@@ -630,23 +626,17 @@ NODE_ENV=production
 
 **Solução**: Remover middleware que modifica headers desnecessariamente.
 
-Para mais detalhes, consulte [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md:1).
-
 ### Erro "Right side of assignment cannot be destructured"
 
 **Causa**: `req.body` está undefined quando tentado desestruturar.
 
 **Solução**: Garantir que body parser é executado antes dos handlers.
 
-Para mais detalhes, consulte [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md:1).
-
 ### Testes Falhando
 
 **Problema**: Testes retornam 404 ao invés de status esperado.
 
 **Solução**: Verificar se o app de teste está montando as rotas corretamente.
-
-Para mais informações sobre testes, consulte [`TESTING.md`](TESTING.md:1).
 
 ## Modelos de Dados
 

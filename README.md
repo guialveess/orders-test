@@ -65,58 +65,73 @@ Esta API foi desenvolvida para gerenciar pedidos, permitindo:
 
 ```
 order-test/
-├── config/
-│   ├── database.ts          # Configuração de conexão com MongoDB
-│   └── swagger.ts           # Configuração do Swagger
-├── middlewares/
-│   └── auth.middleware.ts   # Middleware de autenticação JWT
-├── routes/
-│   ├── index.ts             # Exportador de rotas
-│   ├── auth.routes.ts       # Rotas de autenticação
-│   └── orders.routes.ts     # Rotas de pedidos
 ├── src/
-│   ├── @types/
-│   │   └── express/
-│   │       └── index.d.ts  # Tipos personalizados do Express
-│   └── models/
-│       ├── users/
-│       │   ├── user.interface.ts
-│       │   └── user.schema.ts
-│       └── orders/
-│           ├── order.interface.ts
-│           ├── order.schema.ts
-│           └── order.enums.ts
+│   ├── config/                    # Configurações
+│   │   ├── database.ts            # Configuração de conexão com MongoDB
+│   │   └── swagger.ts             # Configuração do Swagger
+│   ├── controllers/               # Camada de Apresentação (Controllers)
+│   │   ├── auth.controller.ts     # Controller de autenticação
+│   │   └── orders.controller.ts  # Controller de pedidos
+│   ├── dtos/                     # Data Transfer Objects
+│   │   ├── create.order.dto.ts   # DTO para criação de pedidos
+│   │   ├── login.user.dto.ts     # DTO para login de usuários
+│   │   └── register.user.dto.ts  # DTO para registro de usuários
+│   ├── middlewares/              # Middlewares
+│   │   └── auth.middleware.ts    # Middleware de autenticação JWT
+│   ├── models/                   # Modelos de Dados (Mongoose Schemas)
+│   │   ├── users/
+│   │   │   ├── user.interface.ts
+│   │   │   └── user.schema.ts
+│   │   └── orders/
+│   │       ├── order.interface.ts
+│   │       ├── order.schema.ts
+│   │       └── order.enums.ts
+│   ├── repositories/              # Camada de Dados (Repositories)
+│   │   ├── users.repository.ts    # Repositório de usuários
+│   │   └── orders.repository.ts   # Repositório de pedidos
+│   ├── routes/                   # Rotas HTTP
+│   │   ├── index.ts              # Exportador de rotas
+│   │   ├── auth.routes.ts        # Rotas de autenticação
+│   │   └── orders.routes.ts      # Rotas de pedidos
+│   ├── services/                  # Camada de Negócio (Services)
+│   │   ├── auth.service.ts        # Serviço de autenticação
+│   │   └── orders.service.ts     # Serviço de pedidos
+│   └── @types/
+│       └── express/
+│           └── index.d.ts        # Tipos personalizados do Express
 ├── test/
-│   ├── setup.ts            # Configuração do banco de testes
-│   ├── utils.ts            # Utilitários de teste
-│   ├── app.ts              # App Express para testes
-│   ├── auth.routes.test.ts  # Testes de autenticação
-│   └── orders.routes.test.ts# Testes de pedidos
-├── .dockerignore           # Arquivos ignorados no Docker
-├── .env                   # Variáveis de ambiente
-├── .env.test             # Variáveis de ambiente para testes
-├── .gitignore            # Arquivos ignorados no Git
-├── app.ts                # Configuração principal do Express
-├── server.ts             # Ponto de entrada e inicialização
-├── docker-compose.yml     # Configuração do Docker Compose
-├── Dockerfile            # Configuração do Docker
-├── package.json          # Dependências do projeto
-├── tsconfig.json         # Configuração do TypeScript
-├── vitest.config.ts      # Configuração do Vitest
-├── README.md             # Este arquivo
+│   ├── setup.ts                 # Configuração do banco de testes
+│   ├── utils.ts                 # Utilitários de teste
+│   ├── app.ts                   # App Express para testes
+│   ├── auth.routes.test.ts       # Testes de autenticação
+│   └── orders.routes.test.ts     # Testes de pedidos
+├── .dockerignore                # Arquivos ignorados no Docker
+├── .env                        # Variáveis de ambiente
+├── .env.test                  # Variáveis de ambiente para testes
+├── .gitignore                 # Arquivos ignorados no Git
+├── app.ts                      # Configuração principal do Express
+├── server.ts                   # Ponto de entrada e inicialização
+├── docker-compose.yml           # Configuração do Docker Compose
+├── Dockerfile                  # Configuração do Docker
+├── package.json                # Dependências do projeto
+├── tsconfig.json               # Configuração do TypeScript
+├── vitest.config.ts            # Configuração do Vitest
+└── README.md                   # Este arquivo
 ```
 
 ### Padrões de Arquitetura
 
 #### 1. Separation of Concerns (SoC)
 - **Rotas**: Responsáveis apenas por definir endpoints HTTP
+- **Controllers**: Responsáveis por receber requisições HTTP, validar dados e chamar services
+- **Services**: Responsáveis pela lógica de negócio e regras de domínio
 - **Middlewares**: Responsáveis por interceptar e modificar requisições/respostas
-- **Models**: Responsáveis pela estrutura de dados e validação
-- **Controllers**: Lógica de negócio (integrada nas rotas neste projeto)
+- **Repositories**: Responsáveis pelo acesso ao banco de dados (CRUD)
+- **Models**: Responsáveis pela estrutura de dados e validação (Mongoose Schemas)
 
-#### 2. Middleware Chain
+#### 2. Fluxo de Requisição
 ```
-Request → Body Parser → Auth Middleware → Route Handler → Response
+Request → Middleware (Auth) → Controller → Service → Repository → Database → Response
 ```
 
 #### 3. Fluxo de Autenticação
@@ -379,31 +394,57 @@ describe('My Feature', () => {
 
 #### Separação de Responsabilidades
 ```typescript
-// BOM - Rotas apenas definem endpoints
-router.post('/orders', async (req, res) => {
-  const order = await createOrder(req.body);
-  return res.status(201).json(order);
-});
+// BOM - Separação clara de responsabilidades
+// Rotas (src/routes/orders.routes.ts)
+router.post('/', (req, res) => ordersController.create(req, res));
 
-// RUIM - Lógica de negócio misturada com rotas
-router.post('/orders', async (req, res) => {
-  const { lab, patient, customer } = req.body;
-  // ... 50 linhas de lógica de negócio
+// Controller (src/controllers/orders.controller.ts)
+async create(req, res) {
+  const { lab, patient, customer, services } = req.body;
+  const order = await ordersService.create({ lab, patient, customer, services });
   return res.status(201).json(order);
-});
+}
+
+// Service (src/services/orders.service.ts)
+async create(data) {
+  const totalValue = data.services.reduce((sum, s) => sum + s.value, 0);
+  if (totalValue <= 0) throw new Error('Valor inválido');
+  return await ordersRepository.create({ ...data, state: 'CREATED' });
+}
+
+// Repository (src/repositories/orders.repository.ts)
+async create(orderData) {
+  return await Order.create(orderData);
+}
 ```
 
 #### Validação de Dados
 ```typescript
-// BOM - Validação explícita
-if (!lab || !patient || !customer) {
-  return res.status(400).json({ 
-    message: "Campos obrigatórios ausentes" 
-  });
+// BOM - Validação no Controller
+// Controller (src/controllers/orders.controller.ts)
+async create(req, res) {
+  if (!lab || !patient || !customer) {
+    return res.status(400).json({
+      message: "Campos obrigatórios ausentes"
+    });
+  }
+  const order = await ordersService.create({ lab, patient, customer, services });
+  return res.status(201).json(order);
 }
 
-// RUIM - Assume que dados estão válidos
-const order = await Order.create(req.body);
+// Service (src/services/orders.service.ts)
+async create(data) {
+  if (!data.services || data.services.length === 0) {
+    throw new Error("Pedido deve conter ao menos um serviço");
+  }
+  // Regras de negócio
+  return await ordersRepository.create({ ...data, state: 'CREATED' });
+}
+
+// Repository - Apenas acesso ao banco
+async create(orderData) {
+  return await Order.create(orderData);
+}
 ```
 
 ### 2. Middleware
@@ -428,52 +469,63 @@ app.use((err: any, req, res, next) => {
   res.status(500).json({ message: 'Internal server error' });
 });
 
-// RUIM - Tratamento duplicado em cada rota
-router.post('/orders', async (req, res) => {
+// BOM - Tratamento de erros no Controller
+async create(req, res) {
   try {
-    // lógica
-  } catch (err) {
-    res.status(500).json({ message: 'Error' });
+    const order = await ordersService.create(req.body);
+    return res.status(201).json(order);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Erro ao criar pedido';
+    return res.status(400).json({ message });
   }
-});
+}
 ```
 
 ### 3. Segurança
 
 #### Nunca Exponha Senhas
 ```typescript
-// BOM - Remove senha da resposta
-return res.status(201).json({
-  id: user._id,
-  email: user.email,
-  // senha não incluída
-});
+// BOM - Remove senha da resposta no Controller
+// Controller (src/controllers/auth.controller.ts)
+async register(req, res) {
+  const user = await authService.register({ email, password });
+  return res.status(201).json({
+    id: user.id,
+    email: user.email,
+    // senha não incluída
+  });
+}
 
-// RUIM - Exponha senha
-return res.status(201).json(user);
+// Service (src/services/auth.service.ts)
+async register(data) {
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+  const user = await usersRepository.create({ email, password: hashedPassword });
+  return { id: user._id, email: user.email };
+}
 ```
 
 #### Validação de JWT
 ```typescript
 // BOM - Middleware de autenticação
+// Middleware (src/middlewares/auth.middleware.ts)
 export const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ message: 'Token não informado' });
   
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.sub;
+    req.userId = decoded.userId;
     next();
   } catch {
     return res.status(401).json({ message: 'Token inválido' });
   }
 };
 
-// RUIM - Validação manual em cada rota
-router.post('/orders', async (req, res) => {
-  const token = req.headers.authorization;
-  // ... validação repetida
-});
+// Service (src/services/auth.service.ts)
+async verifyToken(token) {
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  return decoded;
+}
 ```
 
 ### 4. Testes

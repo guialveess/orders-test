@@ -113,7 +113,7 @@ describe('Orders Routes', () => {
       const orderData = {
         lab: 'Lab A',
         patient: 'Patient Name',
-        services: [{ name: 'Service 1', value: 100 }],
+        services: [{ name: 'Service1', value: 100 }],
       };
 
       const response = await request(app)

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import * as jwt from "jsonwebtoken";
 
 interface JwtPayload {
-  sub: string;
+  userId: string;
 }
 
 export const authMiddleware = (
@@ -24,7 +24,7 @@ export const authMiddleware = (
       process.env.JWT_SECRET as string
     ) as JwtPayload;
 
-    req.userId = decoded.sub;
+    req.userId = decoded.userId;
     return next();
   } catch {
     return res.status(401).json({ message: "Token inválido" });

@@ -1,9 +1,9 @@
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
-import { swaggerSpec } from '../config/swagger';
-import authRoutes from '../routes/auth.routes';
-import orderRoutes from '../routes/orders.routes';
-import { authMiddleware } from '../middlewares/auth.middleware';
+import { swaggerSpec } from '../src/config/swagger';
+import authRoutes from '../src/routes/auth.routes';
+import orderRoutes from '../src/routes/orders.routes';
+import { authMiddleware } from '../src/middlewares/auth.middleware';
 
 const app = express();
 

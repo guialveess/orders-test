@@ -1,16 +1,13 @@
 import app from "./app";
-import { connectDatabase } from "./config/database";
-import authRoutes from "./routes/auth.routes";
-import orderRoutes from "./routes/orders.routes";
-import { authMiddleware } from "./middlewares/auth.middleware";
+import { connectDatabase } from "./src/config/database";
+import routes from "./src/routes";
 
 const port = 8080;
 
 const bootstrap = async () => {
   await connectDatabase();
 
-  app.use("/auth", authRoutes);
-  app.use("/orders", authMiddleware, orderRoutes);
+  app.use("/api", routes);
 
   app.listen(port, () => {
     console.log(`🚀 Server rodando na porta ${port}`);
